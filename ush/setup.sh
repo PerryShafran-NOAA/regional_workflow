@@ -221,16 +221,15 @@ face climatology files does not exist:
   SFC_CLIMO_DIR = \"${SFC_CLIMO_DIR}\""
 fi
 #
-# If RUN_TASK_MAKE_SFC_CLIMO is set to "TRUE" and the variable specify-
-# ing the directory in which to look for pregenerated grid and orography
-# files (i.e. SFC_CLIMO_DIR) is not empty, then for clarity reset the 
-# latter to an empty string (because it will not be used).
+# If RUN_TASK_MAKE_SFC_CLIMO is set to "TRUE" and the variable specifying 
+# the directory in which to look for pregenerated grid and orography files 
+# (i.e. SFC_CLIMO_DIR) is not empty, then for clarity reset the latter to 
+# an empty string (because it will not be used).
 #
 if [ "${RUN_TASK_MAKE_SFC_CLIMO}" = "TRUE" ] && \
    [ -n "${SFC_CLIMO_DIR}" ]; then
   SFC_CLIMO_DIR=""
 fi
-
 #
 #-----------------------------------------------------------------------
 #
@@ -251,7 +250,6 @@ elif [ "${RUN_TASK_VX_GRIDSTAT}" = "FALSE" ] || \
      [ "${RUN_TASK_VX_GRIDSTAT}" = "NO" ]; then
   RUN_TASK_VX_GRIDSTAT="FALSE"
 fi
-
 #
 #-----------------------------------------------------------------------
 #
@@ -272,8 +270,6 @@ elif [ "${RUN_TASK_VX_POINTSTAT}" = "FALSE" ] || \
      [ "${RUN_TASK_VX_POINTSTAT}" = "NO" ]; then
   RUN_TASK_VX_POINTSTAT="FALSE"
 fi
-
-#
 #
 #-----------------------------------------------------------------------
 #
@@ -354,7 +350,6 @@ fi
 if [ "${DO_SPPT}" = "FALSE" ]; then
   SPPT_MAG=-999.0
 fi
-
 #
 #-----------------------------------------------------------------------
 #
@@ -728,19 +723,19 @@ case $MACHINE in
   "HERA")
     FIXgsm=${FIXgsm:-"/scratch1/NCEPDEV/global/glopara/fix/fix_am"}
     TOPO_DIR=${TOPO_DIR:-"/scratch1/NCEPDEV/global/glopara/fix/fix_orog"}
-    SFC_CLIMO_INPUT_DIR=${SFC_CLIMO_INPUT_DIR:-"/scratch1/NCEPDEV/da/George.Gayno/ufs_utils.git/climo_fields_netcdf"}
+    SFC_CLIMO_INPUT_DIR=${SFC_CLIMO_INPUT_DIR:-"/scratch1/NCEPDEV/global/glopara/fix/fix_sfc_climo"}
     ;;
 
   "ORION")
-    FIXgsm=${FIXgsm:-"/work/noaa/fv3-cam/emc.campara/fix_fv3cam/fix_am"}
-    TOPO_DIR=${TOPO_DIR:-"/work/noaa/fv3-cam/emc.campara/fix_fv3cam/fix_orog"}
-    SFC_CLIMO_INPUT_DIR=${SFC_CLIMO_INPUT_DIR:-"/work/noaa/gsd-fv3-dev/gsketefia/UFS/climo_fields_netcdf"}
+    FIXgsm=${FIXgsm:-"/work/noaa/global/glopara/fix/fix_am"}
+    TOPO_DIR=${TOPO_DIR:-"/work/noaa/global/glopara/fix/fix_orog"}
+    SFC_CLIMO_INPUT_DIR=${SFC_CLIMO_INPUT_DIR:-"/work/noaa/global/glopara/fix/fix_sfc_climo"}
     ;;
 
   "JET")
     FIXgsm=${FIXgsm:-"/lfs4/HFIP/hfv3gfs/glopara/git/fv3gfs/fix/fix_am"}
     TOPO_DIR=${TOPO_DIR:-"/lfs4/HFIP/hfv3gfs/glopara/git/fv3gfs/fix/fix_orog"}
-    SFC_CLIMO_INPUT_DIR=${SFC_CLIMO_INPUT_DIR:-"/lfs1/HFIP/hwrf-data/git/fv3gfs/fix/fix_sfc_climo"}
+    SFC_CLIMO_INPUT_DIR=${SFC_CLIMO_INPUT_DIR:-"/lfs4/HFIP/hfv3gfs/glopara/git/fv3gfs/fix/fix_sfc_climo"}
     ;;
 
   "ODIN")
@@ -939,6 +934,19 @@ LBC_SPEC_FCST_HRS=($( seq ${LBC_SPEC_INTVL_HRS} ${LBC_SPEC_INTVL_HRS} \
 if [ ! -z "${PREDEF_GRID_NAME}" ]; then
   . $USHDIR/set_predef_grid_params.sh
 fi
+#
+#-----------------------------------------------------------------------
+#
+# Make sure GRID_GEN_METHOD is set to a valid value.
+#
+#-----------------------------------------------------------------------
+#
+err_msg="\
+The horizontal grid generation method specified in GRID_GEN_METHOD is 
+not supported:
+  GRID_GEN_METHOD = \"${GRID_GEN_METHOD}\""
+check_var_valid_value \
+  "GRID_GEN_METHOD" "valid_vals_GRID_GEN_METHOD" "${err_msg}"
 #
 #-----------------------------------------------------------------------
 #
@@ -1482,7 +1490,7 @@ contents of FIXLAM.  Reset values are:"
 When RUN_ENVIR is set to \"nco\", it is assumed that the verification
 will not be run.
   RUN_TASK_VX_GRIDSTAT = \"${RUN_TASK_VX_GRIDSTAT}\"
-Resetting RUN_TASK_VX_GRIDSTAT to \"FALSE\" 
+Resetting RUN_TASK_VX_GRIDSTAT to \"FALSE\"
 Reset value is:"
 
     RUN_TASK_VX_GRIDSTAT="FALSE"
@@ -1502,7 +1510,7 @@ Reset value is:"
 When RUN_ENVIR is set to \"nco\", it is assumed that the verification
 will not be run.
   RUN_TASK_VX_POINTSTAT = \"${RUN_TASK_VX_POINTSTAT}\"
-Resetting RUN_TASK_VX_POINTSTAT to \"FALSE\" 
+Resetting RUN_TASK_VX_POINTSTAT to \"FALSE\"
 Reset value is:"
 
     RUN_TASK_VX_POINTSTAT="FALSE"
@@ -1700,19 +1708,6 @@ fi
 NH0=0
 NH3=3
 NH4=4
-#
-#-----------------------------------------------------------------------
-#
-# Make sure GRID_GEN_METHOD is set to a valid value.
-#
-#-----------------------------------------------------------------------
-#
-err_msg="\
-The horizontal grid generation method specified in GRID_GEN_METHOD is 
-not supported:
-  GRID_GEN_METHOD = \"${GRID_GEN_METHOD}\""
-check_var_valid_value \
-  "GRID_GEN_METHOD" "valid_vals_GRID_GEN_METHOD" "${err_msg}"
 #
 #-----------------------------------------------------------------------
 #
@@ -2084,7 +2079,7 @@ The number of grid points in the y direction on the regional grid (ny_-
 T7) must be evenly divisible by the number of tasks per write group 
 (WRTCMP_write_tasks_per_group):
   NY = $NY
-  WRTCMP_write_tasks_per_group = $WRTCMP_write_tasks_per_group
+  WRTCMP_write_tasks_per_group = ${WRTCMP_write_tasks_per_group}
   NY%%write_tasks_per_group = $rem"
   fi
 
@@ -2479,6 +2474,7 @@ UFS_UTILS_DIR="${UFS_UTILS_DIR}"
 SFC_CLIMO_INPUT_DIR="${SFC_CLIMO_INPUT_DIR}"
 TOPO_DIR="${TOPO_DIR}"
 EMC_POST_DIR="${EMC_POST_DIR}"
+
 EXPTDIR="$EXPTDIR"
 LOGDIR="$LOGDIR"
 CYCLE_BASEDIR="${CYCLE_BASEDIR}"

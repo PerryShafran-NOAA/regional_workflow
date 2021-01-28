@@ -103,12 +103,14 @@ export fhr_list
 #
 #-----------------------------------------------------------------------
 #
-# Run exregional_get_ccpa_files.sh script to reorganize the files into
-# a more intuitive structure for this purpose.
+# Check for existence of top-level OBS_DIR 
 #
 #-----------------------------------------------------------------------
 #
-${SCRIPTSDIR}/exregional_get_ndas_files.sh
+if [[ ! -d "$OBS_DIR" ]]; then
+  print_err_msg_exit "\
+  Exiting: OBS_DIR does not exist."
+fi
 
 #
 #-----------------------------------------------------------------------

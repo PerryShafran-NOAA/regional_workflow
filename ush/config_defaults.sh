@@ -373,20 +373,86 @@ FCST_LEN_HRS="24"
 # Set METplus parameters.  Definitions:
 #
 # MODEL: 
+# String that specifies a descriptive name for the model being verified.
+#
 # MET_INSTALL_DIR:
+# Location to top-level directory of MET installation.
+#
 # METPLUS_PATH:
-# VX_CONFIG_DIR:
-# METPLUS_CONF:
-# MET_CONFIG:
+# Location to top-level directory of METplus installation.
+#
 # CCPA_OBS_DIR:
+# User-specified location of top-level directory where CCPA hourly
+# precipitation files used by METplus are located. This parameter needs
+# to be set for both user-provided observations and for observations 
+# that are retrieved from the NOAA HPSS (if the user has access) via
+# the get_obs_ccpa_tn task (activated in workflow by setting 
+# RUN_TASK_GET_OBS_CCPA="TRUE"). METplus is configured to verify 01-, 
+# 03-, 06-, and 24-h accumulated precipitation using hourly CCPA files. 
+# METplus configuration files require the use of predetermined directory 
+# structure and file names. Therefore, if the CCPA files are user 
+# provided, they need to follow the anticipated naming structure: 
+# {YYYYMMDD}/ccpa.t{HH}z.01h.hrap.conus.gb2, where YYYY is the 4-digit 
+# valid year, MM the 2-digit valid month, DD the 2-digit valid day of 
+# the month, and HH the 2-digit valid hour of the day. In addition, a 
+# caveat is noted for using hourly CCPA data. There is a problem with 
+# the valid time in the metadata for files valid from 19 - 00 UTC (or 
+# files  under the '00' directory). The script to pull the CCPA data 
+# from the NOAA HPSS has an example of how to account for this as well
+# as organizing the data into a more intuitive format: 
+# regional_workflow/scripts/exregional_get_ccpa_files.sh. When a fix
+# is provided, it will be accounted for in the
+# exregional_get_ccpa_files.sh script.
+#
 # MRMS_OBS_DIR:
-# NDAS_OBS_DIR: 
+# User-specified location of top-level directory where MRMS composite
+# reflectivity files used by METplus are located. This parameter needs
+# to be set for both user-provided observations and for observations
+# that are retrieved from the NOAA HPSS (if the user has access) via the
+# get_obs_mrms_tn task (activated in workflow by setting 
+# RUN_TASK_GET_OBS_MRMS="TRUE"). METplus configuration files require the
+# use of predetermined directory structure and file names. Therefore, if
+# the MRMS files are user provided, they need to follow the anticipated 
+# naming structure:
+# {YYYYMMDD}/MergedReflectivityQComposite_00.00_{YYYYMMDD}-{HH}{mm}{SS}.grib2,
+# where YYYY is the 4-digit valid year, MM the 2-digit valid month, DD 
+# the 2-digit valid day of the month, HH the 2-digit valid hour of the 
+# day, mm the 2-digit valid minutes of the hour, and SS is the two-digit
+# valid seconds of the hour. In addition, METplus is configured to look
+# for a MRMS composite reflectivity file for the valid time of the 
+# forecast being verified; since MRMS composite reflectivity files do 
+# not always exactly match the valid time, a script, within the main 
+# script to retrieve MRMS data from the NOAA HPSS, is used to identify
+# and rename the MRMS composite reflectivity file to match the valid
+# time of the forecast. The script to pull the MRMS data from the NOAA 
+# HPSS has an example of the expected file naming structure: 
+# regional_workflow/scripts/exregional_get_mrms_files.sh. This script 
+# calls the script used to identify the MRMS file closest to the valid 
+# time: regional_workflow/scripts/mrms_pull_topofhour.py.
+#
+# NDAS_OBS_DIR:
+# User-specified location of top-level directory where NDAS prepbufr 
+# files used by METplus are located. This parameter needs to be set for
+# both user-provided observations and for observations that are 
+# retrieved from the NOAA HPSS (if the user has access) via the 
+# get_obs_ndas_tn task (activated in workflow by setting 
+# RUN_TASK_GET_OBS_NDAS="TRUE"). METplus is configured to verify 
+# near-surface variables hourly and upper-air variables at times valid 
+# at 00 and 12 UTC with NDAS prepbufr files. METplus configuration files
+# require the use of predetermined file names. Therefore, if the NDAS 
+# files are user provided, they need to follow the anticipated naming 
+# structure: prepbufr.ndas.{YYYYMMDDHH}, where YYYY is the 4-digit valid
+# year, MM the 2-digit valid month, DD the 2-digit valid day of the 
+# month, and HH the 2-digit valid hour of the day. The script to pull 
+# the NDAS data from the NOAA HPSS has an example of how to rename the
+# NDAS data into a more intuitive format with the valid time listed in 
+# the file name: regional_workflow/scripts/exregional_get_ndas_files.sh
 #
 #-----------------------------------------------------------------------
 #
 MODEL=""
-MET_INSTALL_DIR="path/to/MET"
-METPLUS_PATH="path/to/METPlus"
+MET_INSTALL_DIR="/path/to/MET"
+METPLUS_PATH="/path/to/METPlus"
 CCPA_OBS_DIR="/path/to/processed/CCPA/data"
 MRMS_OBS_DIR="/path/to/processed/MRMS/data"
 NDAS_OBS_DIR="/path/to/processed/NDAS/data"
@@ -498,17 +564,13 @@ EXTRN_MDL_FILES_LBCS=( "LBCS_file1" "LBCS_file2" "..." )
 # directory or the cycle directories under it.
 #
 #-----------------------------------------------------------------------
-#
-USE_CCPP="FALSE"
-CCPP_PHYS_SUITE="FV3_GSD_v0"
+CCPP_PHYS_SUITE="FV3_GFS_v15p2"
 #
 #-----------------------------------------------------------------------
 #
 # Set GRID_GEN_METHOD.  This variable specifies the method to use to 
-# generate a regional grid in the horizontal, or, if using pregenerated
-# grid files instead of running the grid generation task, the grid generation
-# method that was used to generate those files.  The values that 
-# GRID_GEN_METHOD can take on are:
+# generate a regional grid in the horizontal.  The values that it can 
+# take on are:
 #
 # * "GFDLgrid":
 #   This setting will generate a regional grid by first generating a 
@@ -521,6 +583,10 @@ CCPP_PHYS_SUITE="FV3_GSD_v0"
 # * "ESGgrid":
 #   This will generate a regional grid using the map projection developed
 #   by Jim Purser of EMC.
+#
+# Note that if using a predefined grid (PREDEDF_GRID_NAME set to a valid
+# non-empty value), this parameter is overwritten by the method used to
+# generate that grid.  
 #
 #-----------------------------------------------------------------------
 #
@@ -833,16 +899,18 @@ WRTCMP_dy=""
 # Set PREDEF_GRID_NAME.  This parameter specifies a predefined regional
 # grid, as follows:
 #
-# * If PREDEF_GRID_NAME is set to an empty string, the grid parameters,
-#   time step (DT_ATMOS), computational parameters (e.g. LAYOUT_X, LAYOUT_Y),
-#   and write component parameters set above (and possibly overwritten by
-#   values in the user-specified configuration file) are used.
+# * If PREDEF_GRID_NAME is set to an empty string, the grid generation
+#   method (GRID_GEN_METHOD), grid parameters, time step (DT_ATMOS), 
+#   computational parameters (e.g. LAYOUT_X, LAYOUT_Y), and write component 
+#   parameters set above (and possibly overwritten by values in the user-
+#   specified workflow configuration file) are used.
 #
-# * If PREDEF_GRID_NAME is set to a valid grid name, the grid parameters, 
-#   time step (DT_ATMOS), computational parameters (e.g. LAYOUT_X, LAYOUT_Y),
-#   and write component parameters set above (and possibly overwritten by
-#   values in the user-specified configuration file) are overwritten by 
-#   predefined values for the specified grid.
+# * If PREDEF_GRID_NAME is set to a valid predefined grid name, the grid 
+#   generation method (GRID_GEN_METHOD), grid parameters, time step 
+#   (DT_ATMOS), computational parameters (e.g. LAYOUT_X, LAYOUT_Y), and 
+#   write component parameters set above (and possibly overwritten by 
+#   values in the user-specified workflow configuration file) are overwritten 
+#   by predefined values for the specified grid.
 #
 # This is simply a convenient way to quickly specify a set of parameters
 # that depend on the grid.
@@ -890,19 +958,6 @@ PREEXISTING_DIR_METHOD="delete"
 #
 VERBOSE="TRUE"
 #
-#-----------------------------------------------------------------------
-# Set paths for METplus variables.
-#
-#-----------------------------------------------------------------------
-MODEL=""
-MET_INSTALL_DIR=""
-METPLUS_PATH=""
-VX_CONFIG_DIR=""
-METPLUS_CONF=""
-MET_CONFIG=""
-CCPA_OBS_DIR=""
-MRMS_OBS_DIR=""
-NDAS_OBS_DIR=""
 #-----------------------------------------------------------------------
 #
 # Set flags (and related directories) that determine whether the grid, 
@@ -953,6 +1008,12 @@ OROG_DIR="/path/to/pregenerated/orog/files"
 
 RUN_TASK_MAKE_SFC_CLIMO="TRUE"
 SFC_CLIMO_DIR="/path/to/pregenerated/surface/climo/files"
+
+RUN_TASK_GET_OBS_CCPA="TRUE"
+
+RUN_TASK_GET_OBS_MRMS="TRUE"
+
+RUN_TASK_GET_OBS_NDAS="TRUE"
 
 RUN_TASK_VX_GRIDSTAT="TRUE"
 
@@ -1154,6 +1215,10 @@ MAKE_ICS_TN="make_ics"
 MAKE_LBCS_TN="make_lbcs"
 RUN_FCST_TN="run_fcst"
 RUN_POST_TN="run_post"
+GET_OBS_TN="get_obs"
+GET_OBS_CCPA_TN="get_obs_ccpa"
+GET_OBS_MRMS_TN="get_obs_mrms"
+GET_OBS_NDAS_TN="get_obs_ndas"
 VX_TN="run_vx"
 VX_GRIDSTAT_TN="run_gridstatvx"
 VX_GRIDSTAT_REFC_TN="run_gridstatvx_refc"
@@ -1173,6 +1238,9 @@ NNODES_MAKE_ICS="4"
 NNODES_MAKE_LBCS="4"
 NNODES_RUN_FCST=""  # This is calculated in the workflow generation scripts, so no need to set here.
 NNODES_RUN_POST="2"
+NNODES_GET_OBS_CCPA="1"
+NNODES_GET_OBS_MRMS="1"
+NNODES_GET_OBS_NDAS="1"
 NNODES_VX_GRIDSTAT="1"
 NNODES_VX_POINTSTAT="1"
 #
@@ -1187,6 +1255,9 @@ PPN_MAKE_ICS="12"
 PPN_MAKE_LBCS="12"
 PPN_RUN_FCST="24"  # This may have to be changed depending on the number of threads used.
 PPN_RUN_POST="24"
+PPN_GET_OBS_CCPA="1"
+PPN_GET_OBS_MRMS="1"
+PPN_GET_OBS_NDAS="1"
 PPN_VX_GRIDSTAT="1"
 PPN_VX_POINTSTAT="1"
 #
@@ -1201,6 +1272,9 @@ WTIME_MAKE_ICS="00:30:00"
 WTIME_MAKE_LBCS="00:30:00"
 WTIME_RUN_FCST="04:30:00"
 WTIME_RUN_POST="00:15:00"
+WTIME_GET_OBS_CCPA="00:45:00"
+WTIME_GET_OBS_MRMS="00:45:00"
+WTIME_GET_OBS_NDAS="02:00:00"
 WTIME_VX_GRIDSTAT="01:00:00"
 WTIME_VX_POINTSTAT="01:00:00"
 #
@@ -1301,7 +1375,7 @@ USE_ZMTNBLCK="false"
 #
 #-----------------------------------------------------------------------
 #
-HALO_BLEND=0
+HALO_BLEND=10
 #
 #-----------------------------------------------------------------------
 #
@@ -1321,8 +1395,18 @@ HALO_BLEND=0
 # Name of file located in FVCOM_DIR that has FVCOM data interpolated to 
 # FV3-LAM grid. This file will be copied later to a new location and name
 # changed to fvcom.nc
+#
 #------------------------------------------------------------------------
 #
 USE_FVCOM="FALSE"
 FVCOM_DIR="/user/defined/dir/to/fvcom/data"
 FVCOM_FILE="fvcom.nc"
+#
+#-----------------------------------------------------------------------
+#
+# COMPILER:
+# Type of compiler invoked during the build step. 
+#
+#------------------------------------------------------------------------
+#
+COMPILER="intel"

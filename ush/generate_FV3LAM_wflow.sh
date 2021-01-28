@@ -184,6 +184,10 @@ settings="\
   'make_lbcs_tn': ${MAKE_LBCS_TN}
   'run_fcst_tn': ${RUN_FCST_TN}
   'run_post_tn': ${RUN_POST_TN}
+  'get_obs_tn': ${GET_OBS_TN}
+  'get_obs_ccpa_tn': ${GET_OBS_CCPA_TN}
+  'get_obs_ndas_tn': ${GET_OBS_NDAS_TN}
+  'get_obs_mrms_tn': ${GET_OBS_MRMS_TN}
   'vx_tn': ${VX_TN}
   'vx_gridstat_tn': ${VX_GRIDSTAT_TN}
   'vx_gridstat_refc_tn': ${VX_GRIDSTAT_REFC_TN}
@@ -203,6 +207,9 @@ settings="\
   'nnodes_make_lbcs': ${NNODES_MAKE_LBCS}
   'nnodes_run_fcst': ${NNODES_RUN_FCST}
   'nnodes_run_post': ${NNODES_RUN_POST}
+  'nnodes_get_obs_ccpa': ${NNODES_GET_OBS_CCPA}
+  'nnodes_get_obs_mrms': ${NNODES_GET_OBS_MRMS}
+  'nnodes_get_obs_ndas': ${NNODES_GET_OBS_NDAS}
   'nnodes_vx_gridstat': ${NNODES_VX_GRIDSTAT}
   'nnodes_vx_pointstat': ${NNODES_VX_POINTSTAT}
 
@@ -224,6 +231,9 @@ settings="\
   'ppn_make_lbcs': ${PPN_MAKE_LBCS}
   'ppn_run_fcst': ${PPN_RUN_FCST}
   'ppn_run_post': ${PPN_RUN_POST}
+  'ppn_get_obs_ccpa': ${PPN_GET_OBS_CCPA}
+  'ppn_get_obs_mrms': ${PPN_GET_OBS_MRMS}
+  'ppn_get_obs_ndas': ${PPN_GET_OBS_NDAS}
   'ppn_vx_gridstat': ${PPN_VX_GRIDSTAT}
   'ppn_vx_pointstat': ${PPN_VX_POINTSTAT}
 
@@ -239,6 +249,9 @@ settings="\
   'wtime_make_lbcs': ${WTIME_MAKE_LBCS}
   'wtime_run_fcst': ${WTIME_RUN_FCST}
   'wtime_run_post': ${WTIME_RUN_POST}
+  'wtime_get_obs_ccpa': ${WTIME_GET_OBS_CCPA}
+  'wtime_get_obs_mrms': ${WTIME_GET_OBS_MRMS}
+  'wtime_get_obs_ndas': ${WTIME_GET_OBS_NDAS}
   'wtime_vx_gridstat': ${WTIME_VX_GRIDSTAT}
   'wtime_vx_pointstat': ${WTIME_VX_POINTSTAT}
 #
@@ -259,6 +272,9 @@ settings="\
   'run_task_make_grid': ${RUN_TASK_MAKE_GRID}
   'run_task_make_orog': ${RUN_TASK_MAKE_OROG}
   'run_task_make_sfc_climo': ${RUN_TASK_MAKE_SFC_CLIMO}
+  'run_task_get_obs_ccpa': ${RUN_TASK_GET_OBS_CCPA}
+  'run_task_get_obs_mrms': ${RUN_TASK_GET_OBS_MRMS}
+  'run_task_get_obs_ndas': ${RUN_TASK_GET_OBS_NDAS}
   'run_task_vx_gridstat': ${RUN_TASK_VX_GRIDSTAT}
   'run_task_vx_pointstat': ${RUN_TASK_VX_POINTSTAT}
 #
@@ -360,54 +376,55 @@ done
 #
 #-----------------------------------------------------------------------
 #
-# For select workflow tasks, copy module files from the various cloned
-# external repositories to the appropriate subdirectory under the workflow
-# directory tree.  In principle, this is better than having hard-coded
-# module files for tasks because the copied module files will always be
-# up-to-date.  However, it does require that these module files in the
-# external repositories be coded correctly, e.g. that they really be lua
-# module files and not contain any shell commands (like "export SOME_VARIABLE").
+# For select workflow tasks, copy the system-specific environment and
+# module settings README file from the ufs-srweather-app repository to 
+# the appropriate subdirectory under the workflow directory tree.  In 
+# principle, sourcing this file is better than having hard-coded module
+# files for tasks because the copied module files will always be 
+# up-to-date.
 #
 #-----------------------------------------------------------------------
 #
-machine=${MACHINE,,}
+#machine=${MACHINE,,}
 
-cd_vrfy "${MODULES_DIR}/tasks/$machine"
+#cd_vrfy "${MODULES_DIR}/tasks/$machine"
 
-cp_vrfy -f "${UFS_UTILS_DIR}/modulefiles/build.$machine" "${MAKE_GRID_TN}"
-cp_vrfy -f "${UFS_UTILS_DIR}/modulefiles/build.$machine" "${MAKE_OROG_TN}"
-cp_vrfy -f "${UFS_UTILS_DIR}/modulefiles/build.$machine" "${MAKE_SFC_CLIMO_TN}"
-cp_vrfy -f "${UFS_UTILS_DIR}/modulefiles/build.$machine" "${MAKE_ICS_TN}"
-cp_vrfy -f "${UFS_UTILS_DIR}/modulefiles/build.$machine" "${MAKE_LBCS_TN}"
-if [ $MACHINE = "WCOSS_CRAY" -o $MACHINE = "WCOSS_DELL_P3" ] ; then
-  cp_vrfy -f "${UFS_WTHR_MDL_DIR}/modulefiles/$machine/fv3" "${RUN_FCST_TN}"
-else
-  cp_vrfy -f "${UFS_WTHR_MDL_DIR}/modulefiles/$machine.intel/fv3" "${RUN_FCST_TN}"
-fi
+#cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${MAKE_GRID_TN}"
+#cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${MAKE_OROG_TN}"
+#cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${MAKE_SFC_CLIMO_TN}"
+#cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${MAKE_ICS_TN}"
+#cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${MAKE_LBCS_TN}"
+#if [ $MACHINE = "WCOSS_CRAY" -o $MACHINE = "WCOSS_DELL_P3" ] ; then
+#  cp_vrfy -f "${UFS_WTHR_MDL_DIR}/modulefiles/${machine}/fv3" "${RUN_FCST_TN}"
+#else
+#  cp_vrfy -f "${UFS_WTHR_MDL_DIR}/modulefiles/${machine}.intel/fv3" "${RUN_FCST_TN}"
+#fi
+#cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${RUN_FCST_TN}"
 
 task_names=( "${MAKE_GRID_TN}" "${MAKE_OROG_TN}" "${MAKE_SFC_CLIMO_TN}" "${MAKE_ICS_TN}" "${MAKE_LBCS_TN}" "${RUN_FCST_TN}" )
 #
 # Only some platforms build EMC_post using modules, and some machines 
 # require a different EMC_post modulefile name.
 #
-if [ "${MACHINE}" = "CHEYENNE" ]; then
-  print_info_msg "No post modulefile needed for ${MACHINE}"
-elif [ "${MACHINE}" = "WCOSS_CRAY" ]; then
-  cp_vrfy -f "${EMC_POST_DIR}/modulefiles/post/v8.0.0-cray-intel" "${RUN_POST_TN}"
-  task_names+=("${RUN_POST_TN}")
-else
-  cp_vrfy -f "${EMC_POST_DIR}/modulefiles/post/v8.0.0-$machine" "${RUN_POST_TN}"
-  task_names+=("${RUN_POST_TN}")
-fi
+#if [ "${MACHINE}" = "CHEYENNE" ]; then
+#  print_info_msg "No post modulefile needed for ${MACHINE}"
+#elif [ "${MACHINE}" = "WCOSS_CRAY" ]; then
+#  cp_vrfy -f "${EMC_POST_DIR}/modulefiles/post/v8.0.0-cray-intel" "${RUN_POST_TN}"
+#  cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${RUN_POST_TN}"
+#  task_names+=("${RUN_POST_TN}")
+#else
+#  cp_vrfy -f "${SR_WX_APP_TOP_DIR}/docs/README_${machine}_intel.txt" "${RUN_POST_TN}"
+#  task_names+=("${RUN_POST_TN}")
+#fi
 
-for task in "${task_names[@]}"; do
-  modulefile_local="${task}.local"
-  if [ -f ${modulefile_local} ]; then
-    cat "${modulefile_local}" >> "${task}"
-  fi
-done
+#for task in "${task_names[@]}"; do
+#  modulefile_local="${task}.local"
+#  if [ -f ${modulefile_local} ]; then
+#    cat "${modulefile_local}" >> "${task}"
+#  fi
+#done
 
-cd_vrfy -
+#cd_vrfy -
 #
 #-----------------------------------------------------------------------
 #
@@ -574,7 +591,7 @@ cp_vrfy "${CCPP_PHYS_SUITE_IN_CCPP_FP}" "${CCPP_PHYS_SUITE_FP}"
 #
 #-----------------------------------------------------------------------
 #
-exec_fn="NEMS.exe"
+exec_fn="ufs_model"
 exec_fp="${SR_WX_APP_TOP_DIR}/bin/${exec_fn}"
 #Check for the old build location for fv3 executable
 if [ ! -f "${exec_fp}" ]; then
@@ -645,7 +662,7 @@ if [ "${CCPP_PHYS_SUITE}" = "FV3_GSD_v0" ] || \
     print_err_msg_exit "\
 The value to set the variable lsoil to in the FV3 namelist file (FV3_NML_FP)
 has not been specified for the following combination of physics suite and
-external model ICs:
+external model for ICs:
   CCPP_PHYS_SUITE = \"${CCPP_PHYS_SUITE}\"
   EXTRN_MDL_NAME_ICS = \"${EXTRN_MDL_NAME_ICS}\"
 Please change one or more of these parameters or provide a value for lsoil
